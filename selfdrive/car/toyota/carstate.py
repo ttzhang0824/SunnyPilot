@@ -57,11 +57,8 @@ class CarState(CarStateBase):
     self.low_speed_lockout = False
     self.acc_type = 1
     self.lkas_hud = {}
-    #self.pcm_accel_net = 0.0
-    #self.pcm_true_accel_net = 0.0
-    #self.pcm_calc_accel_net = 0.0
-    #self.pcm_neutral_force = 0.0
-    #self.vsc_slope_angle = 0.0
+    self.pcm_accel_net = 0.0
+    self.slope_angle = 0.0
 
     self.lkas_enabled = None
     self.prev_lkas_enabled = None
@@ -105,6 +102,24 @@ class CarState(CarStateBase):
     self.prev_lkas_enabled = self.lkas_enabled
     self.prev_lta_status = self.lta_status
 
+    # Describes the acceleration request from the PCM if on flat ground, may be higher or lower if pitched
+    # CLUTCH->ACCEL_NET is only accurate for gas, PCM_CRUISE->ACCEL_NET is only accurate for brake
+    # These signals only have meaning when ACC is active
+    if self.CP.flags & ToyotaFlags.RAISED_ACCEL_LIMIT:
+      self.pcm_accel_net = max(cp.vl["CLUTCH"]["ACCEL_NET"], 0.0)
+
+      # Sometimes ACC_BRAKING can be 1 while showing we're applying gas already
+      if cp.vl["PCM_CRUISE"]["ACC_BRAKING"]:
+        self.pcm_accel_net += min(cp.vl["PCM_CRUISE"]["ACCEL_NET"], 0.0)
+
+      # add creeping force at low speeds only for braking, CLUTCH->ACCEL_NET already shows this
+      neutral_accel = max(cp.vl["PCM_CRUISE"]["NEUTRAL_FORCE"] / self.CP.mass, 0.0)
+      if self.pcm_accel_net + neutral_accel < 0.0:
+        self.pcm_accel_net += neutral_accel
+
+    # filtered pitch estimate from the car, negative is a downward slope
+    self.slope_angle = cp.vl["VSC1S07"]["ASLP"] * CV.DEG_TO_RAD
+
     ret.doorOpen = any([cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
                         cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
     ret.seatbeltUnlatched = cp.vl["BODY_CONTROL_STATE"]["SEATBELT_DRIVER_UNLATCHED"] != 0
@@ -130,14 +145,6 @@ class CarState(CarStateBase):
     ret.vEgoRaw = mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr])
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.vEgoCluster = ret.vEgo * 1.015  # minimum of all the cars
-
-    # thought to be the gas/brake as issued by the pcm (0=coasting)
-    #self.pcm_accel_net = cp.vl["PCM_CRUISE"]["ACCEL_NET"]  # this is only accurate for braking * 43
-    #self.pcm_true_accel_net = cp.vl["CLUTCH"]["TRUE_ACCEL_NET"]  # this is only accurate for acceleration * 78
-    #self.pcm_calc_accel_net = cp.vl["GEAR_PACKET_HYBRID"]["CAR_MOVEMENT"] / 78 - cp.vl["BRAKE"]["BRAKE_PEDAL"] / 43
-    #self.pcm_true_accel_net = cp.vl["CLUTCH"]["TRUE_ACCEL_NET"]
-    #self.pcm_neutral_force = cp.vl["PCM_CRUISE"]["NEUTRAL_FORCE"]
-    #self.vsc_slope_angle = cp.vl["VSC1S07"]["ASLP"]
 
     ret.standstill = abs(ret.vEgoRaw) < 1e-3
 
@@ -463,18 +470,18 @@ class CarState(CarStateBase):
       ("BODY_CONTROL_STATE", 3),
       ("BODY_CONTROL_STATE_2", 2),
       ("ESP_CONTROL", 3),
+      ("VSC1S07", 20),
       ("EPS_STATUS", 25),
-      #("GEAR_PACKET_HYBRID", 60),
-      #("BRAKE", 80),
       ("BRAKE_MODULE", 40),
       ("WHEEL_SPEEDS", 80),
       ("STEER_ANGLE_SENSOR", 80),
       ("PCM_CRUISE", 33),
       ("PCM_CRUISE_SM", 1),
-      #("VSC1S07", 20),
       ("STEER_TORQUE_SENSOR", 50),
-      #("CLUTCH", 16),
     ]
+
+    if CP.flags & ToyotaFlags.RAISED_ACCEL_LIMIT:
+      messages.append(("CLUTCH", 15))
 
     if CP.carFingerprint != CAR.TOYOTA_MIRAI:
       messages.append(("ENGINE_RPM", 42))
