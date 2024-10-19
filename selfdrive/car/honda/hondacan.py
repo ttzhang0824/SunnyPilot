@@ -130,7 +130,7 @@ def create_steering_control(packer, CAN, apply_steer, lkas_active, car_fingerpri
     "SEND_STEER_STATUS_TO_CAN": 1,
   }
   # bus = get_lkas_cmd_bus(CAN, car_fingerprint, radar_disabled)
-  bus = 2 if car_fingerprint in SERIAL_STEERING else get_lkas_cmd_bus(car_fingerprint, radar_disabled)
+  bus = 2 if car_fingerprint in SERIAL_STEERING else get_lkas_cmd_bus(CAN, car_fingerprint, radar_disabled)
   return packer.make_can_msg("STEERING_CONTROL", bus, values)
 
 
@@ -142,7 +142,7 @@ def create_bosch_supplemental_1(packer, CAN, car_fingerprint):
     "SET_ME_X10": 0x10,
   }
   # bus = get_lkas_cmd_bus(CAN, car_fingerprint)
-  bus = 2 if car_fingerprint in SERIAL_STEERING else get_lkas_cmd_bus(car_fingerprint, radar_disabled)
+  bus = 2 if car_fingerprint in SERIAL_STEERING else get_lkas_cmd_bus(CAN, car_fingerprint)
   return packer.make_can_msg("BOSCH_SUPPLEMENTAL_1", bus, values)
 
 
@@ -221,5 +221,5 @@ def spam_buttons_command(packer, CAN, button_val, car_fingerprint):
   }
   # send buttons to camera on radarless cars
   # bus = CAN.camera if car_fingerprint in HONDA_BOSCH_RADARLESS else CAN.pt
-  bus = 2 if car_fingerprint in HONDA_BOSCH_RADARLESS else get_pt_bus(car_fingerprint)
+  bus = 2 if car_fingerprint in HONDA_BOSCH_RADARLESS else CAN.pt
   return packer.make_can_msg("SCM_BUTTONS", bus, values)
