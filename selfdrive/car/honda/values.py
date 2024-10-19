@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, IntFlag, StrEnum
+from enum import Enum, IntFlag
 
 from cereal import car
 from openpilot.common.conversions import Conversions as CV
@@ -103,20 +103,6 @@ class HondaCarDocs(CarDocs):
       self.car_parts = CarParts.common([CarHarness.bosch_b]) if CP.flags & HondaFlags.BOSCH_RADARLESS else CarParts.common([CarHarness.bosch_a])
     else:
       self.car_parts = CarParts.common([CarHarness.nidec])
-
-
-class Footnote(Enum):
-  CIVIC_DIESEL = CarFootnote(
-    "2019 Honda Civic 1.6L Diesel Sedan does not have ALC below 12mph.",
-    Column.FSR_STEERING)
-  ACCORD_NIDEC = CarFootnote(
-    "openpilot operates above 25mph for 9th Generation Accord 4CYL, 6CYL and Hybrid which don't have Low-Speed Follow.",
-    Column.FSR_LONGITUDINAL)
-  SERIAL_STEERING = CarFootnote(
-    "9th Generation model-years have ALC data over serial lines and require third party hardware to " +
-    "interface with openpilot. For more information, " +
-    "see <a href=\"https://github.com/mlocoteta/serialSteeringHardware\" target=\"_blank\">mlocoteta's GitHub</a>.",
-    Column.HARDWARE)
 
 
 class HondaBoschPlatformConfig(PlatformConfig):
@@ -354,10 +340,8 @@ FW_QUERY_CONFIG = FwQueryConfig(
 
 STEER_THRESHOLD = {
   # default is 1200, overrides go here
-  CAR.ACCORD_NIDEC_4CYL: 30,
   CAR.ACURA_RDX: 400,
   CAR.CRV_EU: 400,
-  CAR.ACURA_MDX: 25,
   CAR.ACURA_MDX_20A: 25,
 }
 
