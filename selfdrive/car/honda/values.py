@@ -364,5 +364,5 @@ HONDA_BOSCH_RADARLESS = CAR.with_flags(HondaFlags.BOSCH_RADARLESS)
 
 SERIAL_STEERING = {CAR.ACURA_MDX_20A}
 
-
+DBC = CAR.create_dbc_map()
 
