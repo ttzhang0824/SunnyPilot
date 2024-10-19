@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, IntFlag
+from enum import Enum, IntFlag, StrEnum
 
 from cereal import car
 from openpilot.common.conversions import Conversions as CV
@@ -93,34 +93,6 @@ VISUAL_HUD = {
   VisualAlert.speedTooHigh: 8
 }
 
-class CAR(StrEnum):
-  ACCORD = "HONDA ACCORD 2018"
-  ACCORDH = "HONDA ACCORD HYBRID 2018"
-  ACCORD_NIDEC_4CYL = "HONDA ACCORD 4CYL 9TH GEN"
-  CIVIC = "HONDA CIVIC 2016"
-  CIVIC_BOSCH = "HONDA CIVIC (BOSCH) 2019"
-  CIVIC_BOSCH_DIESEL = "HONDA CIVIC SEDAN 1.6 DIESEL 2019"
-  CIVIC_2022 = "HONDA CIVIC 2022"
-  ACURA_ILX = "ACURA ILX 2016"
-  CRV = "HONDA CR-V 2016"
-  CRV_5G = "HONDA CR-V 2017"
-  CRV_EU = "HONDA CR-V EU 2016"
-  CRV_HYBRID = "HONDA CR-V HYBRID 2019"
-  FIT = "HONDA FIT 2018"
-  FREED = "HONDA FREED 2020"
-  HRV = "HONDA HRV 2019"
-  HRV_3G = "HONDA HR-V 2023"
-  ODYSSEY = "HONDA ODYSSEY 2018"
-  ODYSSEY_CHN = "HONDA ODYSSEY CHN 2019"
-  ACURA_RDX = "ACURA RDX 2018"
-  ACURA_RDX_3G = "ACURA RDX 2020"
-  PILOT = "HONDA PILOT 2017"
-  RIDGELINE = "HONDA RIDGELINE 2017"
-  INSIGHT = "HONDA INSIGHT 2019"
-  HONDA_E = "HONDA E 2020"
-  CLARITY = "HONDA CLARITY 2018"
-  ACURA_MDX = "ACURA MDX 2018 STANDARD SERIAL STEERING"
-  ACURA_MDX_20A = "ACURA MDX 2020 STANDARD SERIAL STEERING"
   
 @dataclass
 class HondaCarDocs(CarDocs):
@@ -283,6 +255,14 @@ class CAR(Platforms):
     dbc_dict('acura_rdx_2018_can_generated', 'acura_ilx_2016_nidec'),
     flags=HondaFlags.NIDEC_ALT_SCM_MESSAGES,
   )
+
+  ACURA_MDX_20A = HondaNidecPlatformConfig(
+    [HondaCarDocs("ACURA MDX 2020 STANDARD SERIAL STEERING", "All", min_steer_speed=12. * CV.MPH_TO_MS)],
+    CarSpecs(mass=4275 * CV.LB_TO_KG, wheelbase=2.86, steerRatio=15.66, centerToFrontRatio=0.428, tireStiffnessFactor=0.444),  # as spec
+    dbc_dict('acura_mdx_2020', 'acura_ilx_2016_nidec'),
+    flags=HondaFlags.NIDEC_ALT_SCM_MESSAGES,
+  )
+  
   HONDA_PILOT = HondaNidecPlatformConfig(
     [
       HondaCarDocs("Honda Pilot 2016-22", min_steer_speed=12. * CV.MPH_TO_MS),
@@ -371,51 +351,6 @@ FW_QUERY_CONFIG = FwQueryConfig(
   ],
 )
 
-STEER_THRESHOLD = {
-  # default is 1200, overrides go here
-  CAR.HONDA_ACCORD_4CYL_9TH_GEN: 30,
-  CAR.ACURA_RDX: 400,
-  CAR.HONDA_CRV_EU: 400,
-}
-
-HONDA_NIDEC_ALT_PCM_ACCEL = CAR.with_flags(HondaFlags.NIDEC_ALT_PCM_ACCEL)
-HONDA_NIDEC_ALT_SCM_MESSAGES = CAR.with_flags(HondaFlags.NIDEC_ALT_SCM_MESSAGES)
-HONDA_BOSCH = CAR.with_flags(HondaFlags.BOSCH)
-HONDA_BOSCH_RADARLESS = CAR.with_flags(HondaFlags.BOSCH_RADARLESS)
-SERIAL_STEERING = {CAR.HONDA_ACCORD_4CYL_9TH_GEN, }
-
-
-DBC = CAR.create_dbc_map()
-
-DBC = {
-  CAR.ACCORD_NIDEC_4CYL: dbc_dict('honda_accord_touring_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.ACCORD: dbc_dict('honda_accord_2018_can_generated', None),
-  CAR.ACCORDH: dbc_dict('honda_accord_2018_can_generated', None),
-  CAR.ACURA_ILX: dbc_dict('acura_ilx_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.ACURA_RDX: dbc_dict('acura_rdx_2018_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.ACURA_RDX_3G: dbc_dict('acura_rdx_2020_can_generated', None),
-  CAR.CIVIC: dbc_dict('honda_civic_touring_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.CIVIC_BOSCH: dbc_dict('honda_civic_hatchback_ex_2017_can_generated', None),
-  CAR.CIVIC_BOSCH_DIESEL: dbc_dict('honda_accord_2018_can_generated', None),
-  CAR.CRV: dbc_dict('honda_crv_touring_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.CRV_5G: dbc_dict('honda_crv_ex_2017_can_generated', None, body_dbc='honda_crv_ex_2017_body_generated'),
-  CAR.CRV_EU: dbc_dict('honda_crv_executive_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.CRV_HYBRID: dbc_dict('honda_accord_2018_can_generated', None),
-  CAR.FIT: dbc_dict('honda_fit_ex_2018_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.FREED: dbc_dict('honda_fit_ex_2018_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.HRV: dbc_dict('honda_fit_ex_2018_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.HRV_3G: dbc_dict('honda_civic_ex_2022_can_generated', None),
-  CAR.ODYSSEY: dbc_dict('honda_odyssey_exl_2018_generated', 'acura_ilx_2016_nidec'),
-  CAR.ODYSSEY_CHN: dbc_dict('honda_odyssey_extreme_edition_2018_china_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.PILOT: dbc_dict('acura_ilx_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.RIDGELINE: dbc_dict('acura_ilx_2016_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.INSIGHT: dbc_dict('honda_insight_ex_2019_can_generated', None),
-  CAR.HONDA_E: dbc_dict('acura_rdx_2020_can_generated', None),
-  CAR.CIVIC_2022: dbc_dict('honda_civic_ex_2022_can_generated', None),
-  CAR.CLARITY: dbc_dict('honda_clarity_hybrid_2018_can_generated', 'acura_ilx_2016_nidec'),
-  CAR.ACURA_MDX: dbc_dict('acura_mdx_2018', 'acura_ilx_2016_nidec'),
-  CAR.ACURA_MDX_20A: dbc_dict('acura_mdx_2020', 'acura_ilx_2016_nidec'),
-}
 
 STEER_THRESHOLD = {
   # default is 1200, overrides go here
@@ -426,11 +361,12 @@ STEER_THRESHOLD = {
   CAR.ACURA_MDX_20A: 25,
 }
 
-HONDA_NIDEC_ALT_PCM_ACCEL = {CAR.ODYSSEY}
-HONDA_NIDEC_ALT_SCM_MESSAGES = {CAR.ACURA_ILX, CAR.ACURA_RDX, CAR.CRV, CAR.CRV_EU, CAR.FIT, CAR.FREED, CAR.HRV, CAR.ODYSSEY_CHN,
-                                CAR.PILOT, CAR.RIDGELINE, CAR.ACCORD_NIDEC_4CYL, CAR.ACURA_MDX, CAR.ACURA_MDX_20A}
-HONDA_BOSCH = {CAR.ACCORD, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_5G,
-               CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G}
-HONDA_BOSCH_RADARLESS = {CAR.CIVIC_2022, CAR.HRV_3G}
+HONDA_NIDEC_ALT_PCM_ACCEL = CAR.with_flags(HondaFlags.NIDEC_ALT_PCM_ACCEL)
+HONDA_NIDEC_ALT_SCM_MESSAGES = CAR.with_flags(HondaFlags.NIDEC_ALT_SCM_MESSAGES)
+HONDA_BOSCH = CAR.with_flags(HondaFlags.BOSCH)
+HONDA_BOSCH_RADARLESS = CAR.with_flags(HondaFlags.BOSCH_RADARLESS)
 
 SERIAL_STEERING = {CAR.ACURA_MDX, CAR.ACURA_MDX_20A}
+
+
+
