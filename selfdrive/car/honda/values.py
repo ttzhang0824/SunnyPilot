@@ -93,6 +93,18 @@ VISUAL_HUD = {
   VisualAlert.speedTooHigh: 8
 }
 
+class Footnote(Enum):
+  CIVIC_DIESEL = CarFootnote(
+    "2019 Honda Civic 1.6L Diesel Sedan does not have ALC below 12mph.",
+    Column.FSR_STEERING)
+  ACCORD_NIDEC = CarFootnote(
+    "openpilot operates above 25mph for 9th Generation Accord 4CYL, 6CYL and Hybrid which don't have Low-Speed Follow.",
+    Column.FSR_LONGITUDINAL)
+  SERIAL_STEERING = CarFootnote(
+    "9th Generation model-years have ALC data over serial lines and require third party hardware to " +
+    "interface with openpilot. For more information, " +
+    "see <a href=\"https://github.com/mlocoteta/serialSteeringHardware\" target=\"_blank\">mlocoteta's GitHub</a>.",
+    Column.HARDWARE)
   
 @dataclass
 class HondaCarDocs(CarDocs):
