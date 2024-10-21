@@ -1,6 +1,6 @@
 from openpilot.common.conversions import Conversions as CV
 from openpilot.selfdrive.car import CanBusBase
-from openpilot.selfdrive.car.honda.values import HondaFlags, HONDA_BOSCH, HONDA_BOSCH_RADARLESS, CAR, CarControllerParams
+from openpilot.selfdrive.car.honda.values import HondaFlags, HONDA_BOSCH, HONDA_BOSCH_RADARLESS, CAR, CarControllerParams, SERIAL_STEERING
 
 # CAN bus layout with relay
 # 0 = ACC-CAN - radar side
@@ -124,11 +124,16 @@ def create_steering_control(packer, CAN, apply_steer, lkas_active, car_fingerpri
   values = {
     "STEER_TORQUE": apply_steer if lkas_active else 0,
     "STEER_TORQUE_REQUEST": lkas_active,
+    "SEND_ALL_LIN_TO_CAN": 1,
+    "SEND_LIN_WHOLE_DATA": 1,
+    "SEND_MOTOR_TORQUE_TO_CAN": 1,
+    "SEND_STEER_STATUS_TO_CAN": 1,    
   }
-  bus = get_lkas_cmd_bus(CAN, car_fingerprint, radar_disabled)
+  # bus = get_lkas_cmd_bus(CAN, car_fingerprint, radar_disabled)
+  bus = 2 if car_fingerprint in SERIAL_STEERING else get_lkas_cmd_bus(CAN, car_fingerprint, radar_disabled)
   return packer.make_can_msg("STEERING_CONTROL", bus, values)
 
-
+ 
 def create_bosch_supplemental_1(packer, CAN, car_fingerprint):
   # non-active params
   values = {
@@ -136,7 +141,8 @@ def create_bosch_supplemental_1(packer, CAN, car_fingerprint):
     "SET_ME_X80": 0x80,
     "SET_ME_X10": 0x10,
   }
-  bus = get_lkas_cmd_bus(CAN, car_fingerprint)
+  # bus = get_lkas_cmd_bus(CAN, car_fingerprint)
+  bus = 2 if car_fingerprint in SERIAL_STEERING else get_lkas_cmd_bus(CAN, car_fingerprint)
   return packer.make_can_msg("BOSCH_SUPPLEMENTAL_1", bus, values)
 
 
@@ -214,5 +220,6 @@ def spam_buttons_command(packer, CAN, button_val, car_fingerprint):
     'CRUISE_SETTING': 0,
   }
   # send buttons to camera on radarless cars
-  bus = CAN.camera if car_fingerprint in HONDA_BOSCH_RADARLESS else CAN.pt
+  # bus = CAN.camera if car_fingerprint in HONDA_BOSCH_RADARLESS else CAN.pt
+  bus = 2 if car_fingerprint in HONDA_BOSCH_RADARLESS else CAN.pt
   return packer.make_can_msg("SCM_BUTTONS", bus, values)
