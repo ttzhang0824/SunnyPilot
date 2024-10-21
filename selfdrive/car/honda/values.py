@@ -256,6 +256,14 @@ class CAR(Platforms):
     dbc_dict('acura_ilx_2016_can_generated', 'acura_ilx_2016_nidec'),
     flags=HondaFlags.NIDEC_ALT_SCM_MESSAGES,
   )
+
+  ACURA_MDX_20A = HondaNidecPlatformConfig(
+    [HondaCarDocs("ACURA MDX 2020 STANDARD SERIAL STEERING", "All", min_steer_speed=12. * CV.MPH_TO_MS)],
+    CarSpecs(mass=4275 * CV.LB_TO_KG, wheelbase=2.86, steerRatio=15.66, centerToFrontRatio=0.428, tireStiffnessFactor=0.444),  # as spec
+    dbc_dict('acura_mdx_2020', 'acura_ilx_2016_nidec'),
+    flags=HondaFlags.NIDEC_ALT_SCM_MESSAGES,
+  )
+  
   HONDA_RIDGELINE = HondaNidecPlatformConfig(
     [HondaCarDocs("Honda Ridgeline 2017-24", min_steer_speed=12. * CV.MPH_TO_MS)],
     CarSpecs(mass=4515 * CV.LB_TO_KG, wheelbase=3.18, centerToFrontRatio=0.41, steerRatio=15.59, tireStiffnessFactor=0.444),  # as spec
@@ -340,13 +348,14 @@ STEER_THRESHOLD = {
   CAR.HONDA_ACCORD_4CYL_9TH_GEN: 30,
   CAR.ACURA_RDX: 400,
   CAR.HONDA_CRV_EU: 400,
+  CAR.ACURA_MDX_20A: 25,
 }
+
 
 HONDA_NIDEC_ALT_PCM_ACCEL = CAR.with_flags(HondaFlags.NIDEC_ALT_PCM_ACCEL)
 HONDA_NIDEC_ALT_SCM_MESSAGES = CAR.with_flags(HondaFlags.NIDEC_ALT_SCM_MESSAGES)
 HONDA_BOSCH = CAR.with_flags(HondaFlags.BOSCH)
 HONDA_BOSCH_RADARLESS = CAR.with_flags(HondaFlags.BOSCH_RADARLESS)
-SERIAL_STEERING = {CAR.HONDA_ACCORD_4CYL_9TH_GEN, }
-
+SERIAL_STEERING = {CAR.HONDA_ACCORD_4CYL_9TH_GEN, CAR.ACURA_MDX_20A}
 
 DBC = CAR.create_dbc_map()
