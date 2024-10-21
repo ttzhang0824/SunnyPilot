@@ -8,7 +8,7 @@ from openpilot.common.params import Params
 from opendbc.can.packer import CANPacker
 from openpilot.selfdrive.car import DT_CTRL, rate_limit, make_tester_present_msg, create_gas_interceptor_command
 from openpilot.selfdrive.car.honda import hondacan
-from openpilot.selfdrive.car.honda.values import CruiseButtons, VISUAL_HUD, HONDA_BOSCH, HONDA_BOSCH_RADARLESS, HONDA_NIDEC_ALT_PCM_ACCEL, CarControllerParams
+from openpilot.selfdrive.car.honda.values import CruiseButtons, VISUAL_HUD, HONDA_BOSCH, HONDA_BOSCH_RADARLESS, HONDA_NIDEC_ALT_PCM_ACCEL, CarControllerParams, SERIAL_STEERING, LKAS_LIMITS
 from openpilot.selfdrive.car.interfaces import CarControllerBase
 from openpilot.selfdrive.controls.lib.drive_helpers import HONDA_V_CRUISE_MIN
 
@@ -202,7 +202,38 @@ class CarController(CarControllerBase):
     # steer torque is converted back to CAN reference (positive when steering right)
     apply_steer = int(interp(-limited_steer * self.params.STEER_MAX,
                              self.params.STEER_LOOKUP_BP, self.params.STEER_LOOKUP_V))
+# *** 2020 MDX
+        if (CS.CP.carFingerprint in SERIAL_STEERING):
+      apply_steer = apply_driver_steer_torque_limits(apply_steer, self.apply_steer_last, CS.out.steeringTorque, LKAS_LIMITS, ss=True)
+      self.apply_steer_last = apply_steer
+      if apply_steer > 229 and False:
+        apply_steer_orig = apply_steer
+        apply_steer = (apply_steer - 229) * 2 + apply_steer
+        if apply_steer > 240:
+            self.apply_steer_over_max_counter += 1
+            if self.apply_steer_over_max_counter > 3:
+                apply_steer = apply_steer_orig
+                self.apply_steer_over_max_counter = 0
+            else:
+                self.apply_steer_over_max_counter = 0
+      elif apply_steer < -229 and False:
+        apply_steer_orig = apply_steer
+        apply_steer = (apply_steer + 229) * 2 + apply_steer
+        if apply_steer < -240:
+            self.apply_steer_over_max_counter+= 1
+            if self.apply_steer_over_max_counter > 3:
+                apply_steer = apply_steer_orig
+                self.apply_steer_over_max_counter = 0
+            else:
+                self.apply_steer_over_max_counter = 0
+      else:
+        self.apply_steer_over_max_counter = 0
 
+    self.apply_steer_last = apply_steer
+
+    # steer torque is converted back to CAN reference (positive when steering right)
+    # apply_steer = -apply_steer
+    
     if not self.CP.pcmCruiseSpeed:
       if not self.last_speed_limit_sign_tap_prev and CS.params_list.last_speed_limit_sign_tap:
         self.sl_force_active_timer = self.frame
