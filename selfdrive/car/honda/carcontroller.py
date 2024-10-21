@@ -6,7 +6,7 @@ from openpilot.common.conversions import Conversions as CV
 from openpilot.common.numpy_fast import clip, interp
 from openpilot.common.params import Params
 from opendbc.can.packer import CANPacker
-from openpilot.selfdrive.car import DT_CTRL, rate_limit, make_tester_present_msg, create_gas_interceptor_command, , apply_driver_steer_torque_limits
+from openpilot.selfdrive.car import DT_CTRL, rate_limit, make_tester_present_msg, create_gas_interceptor_command, apply_driver_steer_torque_limits
 from openpilot.selfdrive.car.honda import hondacan
 from openpilot.selfdrive.car.honda.values import CruiseButtons, VISUAL_HUD, HONDA_BOSCH, HONDA_BOSCH_RADARLESS, HONDA_NIDEC_ALT_PCM_ACCEL, CarControllerParams, SERIAL_STEERING, LKAS_LIMITS
 from openpilot.selfdrive.car.interfaces import CarControllerBase
