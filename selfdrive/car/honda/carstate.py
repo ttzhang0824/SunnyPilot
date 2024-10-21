@@ -39,7 +39,7 @@ def get_can_messages(CP, gearbox_msg):
       ("SCM_BUTTONS", 25),
     ]
 
-  if CP.carFingerprint in (CAR.HONDA_CRV_HYBRID, CAR.HONDA_CIVIC_BOSCH_DIESEL, CAR.ACURA_RDX_3G, CAR.HONDA_E):
+  if CP.carFingerprint in (CAR.HONDA_CRV_HYBRID, CAR.HONDA_CIVIC_BOSCH_DIESEL, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.ACURA_MDX_20A):
     messages.append((gearbox_msg, 50))
   else:
     messages.append((gearbox_msg, 100))
@@ -142,8 +142,14 @@ class CarState(CarStateBase):
                           cp.vl["DOORS_STATUS"]["DOOR_OPEN_RL"], cp.vl["DOORS_STATUS"]["DOOR_OPEN_RR"]])
     ret.seatbeltUnlatched = bool(cp.vl["SEATBELT_STATUS"]["SEATBELT_DRIVER_LAMP"] or not cp.vl["SEATBELT_STATUS"]["SEATBELT_DRIVER_LATCHED"])
 
-    steer_status = self.steer_status_values[cp.vl["STEER_STATUS"]["STEER_STATUS"]]
-    ret.steerFaultPermanent = steer_status not in ("NORMAL", "NO_TORQUE_ALERT_1", "NO_TORQUE_ALERT_2", "LOW_SPEED_LOCKOUT", "TMP_FAULT")
+    # steer_status = self.steer_status_values[cp.vl["STEER_STATUS"]["STEER_STATUS"]]
+    # ret.steerFaultPermanent = steer_status not in ("NORMAL", "NO_TORQUE_ALERT_1", "NO_TORQUE_ALERT_2", "LOW_SPEED_LOCKOUT", "TMP_FAULT")
+
+    if self.CP.carFingerprint in SERIAL_STEERING:
+      steer_status = self.steer_status_values[cp_cam.vl["STEER_STATUS"]['STEER_STATUS']]
+    else:
+      steer_status = self.steer_status_values[cp.vl["STEER_STATUS"]["STEER_STATUS"]]
+    
     # LOW_SPEED_LOCKOUT is not worth a warning
     # NO_TORQUE_ALERT_2 can be caused by bump or steering nudge from driver
     ret.steerFaultTemporary = steer_status not in ("NORMAL", "LOW_SPEED_LOCKOUT", "NO_TORQUE_ALERT_2")
@@ -204,10 +210,19 @@ class CarState(CarStateBase):
       ret.gas = cp.vl["POWERTRAIN_DATA"]["PEDAL_GAS"]
       ret.gasPressed = ret.gas > 1e-5
 
-    ret.steeringTorque = cp.vl["STEER_STATUS"]["STEER_TORQUE_SENSOR"]
-    ret.steeringTorqueEps = cp.vl["STEER_MOTOR_TORQUE"]["MOTOR_TORQUE"]
-    ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD.get(self.CP.carFingerprint, 1200)
+    # ret.steeringTorque = cp.vl["STEER_STATUS"]["STEER_TORQUE_SENSOR"]
+    # ret.steeringTorqueEps = cp.vl["STEER_MOTOR_TORQUE"]["MOTOR_TORQUE"]
 
+
+    if self.CP.carFingerprint in SERIAL_STEERING:
+      ret.steeringTorque = cp_cam.vl["STEER_STATUS"]['STEER_TORQUE_SENSOR']
+      ret.steeringTorqueEps = cp_cam.vl["STEER_MOTOR_TORQUE"]['MOTOR_TORQUE']
+    else:
+      ret.steeringTorque = cp.vl["STEER_STATUS"]['STEER_TORQUE_SENSOR']
+      ret.steeringTorqueEps = cp.vl["STEER_MOTOR_TORQUE"]['MOTOR_TORQUE']
+
+    ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD.get(self.CP.carFingerprint, 1200)
+    
     if self.CP.carFingerprint in HONDA_BOSCH:
       # The PCM always manages its own cruise control state, but doesn't publish it
       if self.CP.carFingerprint in HONDA_BOSCH_RADARLESS:
@@ -297,6 +312,13 @@ class CarState(CarStateBase):
         ("STEERING_CONTROL", 100),
       ]
 
+    if CP.carFingerprint in SERIAL_STEERING:
+      messages = [
+       # ("STEERING_CONTROL", 100),
+        ("STEER_MOTOR_TORQUE", 100),
+        ("STEER_STATUS", 100)
+        ]
+    
     if CP.carFingerprint in HONDA_BOSCH_RADARLESS:
       messages += [
         ("ACC_HUD", 10),
