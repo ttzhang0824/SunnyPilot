@@ -127,7 +127,7 @@ class CarInterface(CarInterfaceBase):
         ret.steerActuatorDelay = 0.1
         #ret.lateralTuning.pid.kf = 0.000035
         ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.115], [0.052]]
-        ret.minSteerSpeed = 25.5* CV.KPH_TO_MS
+        ret.minSteerSpeed = 11.5
 
     
     elif candidate == CAR.ACURA_ILX:
