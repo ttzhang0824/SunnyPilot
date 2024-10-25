@@ -266,7 +266,7 @@ class CAR(Platforms):
   )
 
   ACURA_MDX_20A = HondaNidecPlatformConfig(
-    [HondaCarDocs("ACURA MDX 2020 STANDARD SERIAL STEERING", "All", min_steer_speed=12. * CV.MPH_TO_MS)],
+    [HondaCarDocs("ACURA MDX 2020 STANDARD SERIAL STEERING", "All", min_steer_speed=25.5 * CV.MPH_TO_MS)],
     CarSpecs(mass=4275 * CV.LB_TO_KG, wheelbase=2.86, steerRatio=15.66, centerToFrontRatio=0.428, tireStiffnessFactor=0.444),  # as spec
     dbc_dict('acura_mdx_2020', 'acura_ilx_2016_nidec'),
     flags=HondaFlags.NIDEC_ALT_SCM_MESSAGES,
