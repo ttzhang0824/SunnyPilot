@@ -126,6 +126,7 @@ class CarController(CarControllerBase):
     self.gas = 0.0
     self.brake = 0.0
     self.last_steer = 0.0
+    self.apply_steer_last = 0
     self.last_button_frame = 0
 
     self.sm = messaging.SubMaster(['longitudinalPlanSP'])
@@ -203,6 +204,14 @@ class CarController(CarControllerBase):
     apply_steer = int(interp(-limited_steer * self.params.STEER_MAX,
                              self.params.STEER_LOOKUP_BP, self.params.STEER_LOOKUP_V))
 
+    if (self.CP.carFingerprint in SERIAL_STEERING):
+      apply_steer = apply_driver_steer_torque_limits(apply_steer, self.apply_steer_last, CS.out.steeringTorque, LKAS_LIMITS, ss=True)
+      self.apply_steer_last = apply_steer
+    
+
+    if apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+      CC.latActive = False
+      apply_steer = 0
    
     if not self.CP.pcmCruiseSpeed:
       if not self.last_speed_limit_sign_tap_prev and CS.params_list.last_speed_limit_sign_tap:
