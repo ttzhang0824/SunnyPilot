@@ -211,7 +211,6 @@ class CarController(CarControllerBase):
     apply_steer = -apply_steer
 
     if apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
-      CC.latActive = False
       apply_steer = 0
    
     if not self.CP.pcmCruiseSpeed:
