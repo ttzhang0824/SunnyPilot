@@ -210,8 +210,8 @@ class CarController(CarControllerBase):
       
     apply_steer = -apply_steer
 
-    if apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
-      apply_steer = 0
+    #if apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+    #  apply_steer = 0
    
     if not self.CP.pcmCruiseSpeed:
       if not self.last_speed_limit_sign_tap_prev and CS.params_list.last_speed_limit_sign_tap:
