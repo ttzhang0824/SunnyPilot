@@ -201,7 +201,7 @@ class CarController(CarControllerBase):
     # **** process the car messages ****
 
     # steer torque is converted back to CAN reference (positive when steering right)
-    apply_steer = int(interp(-limited_steer * self.params.STEER_MAX,
+    apply_steer = int(interp(limited_steer * self.params.STEER_MAX,
                              self.params.STEER_LOOKUP_BP, self.params.STEER_LOOKUP_V))
 
     if (self.CP.carFingerprint in SERIAL_STEERING):
