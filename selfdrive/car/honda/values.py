@@ -22,12 +22,12 @@ class CarControllerParams:
   NIDEC_ACCEL_MAX = 1.6  # m/s^2, lower than 2.0 m/s^2 for tuning reasons
 
   NIDEC_ACCEL_LOOKUP_BP = [-1., 0., .6]
-  NIDEC_ACCEL_LOOKUP_V = [-3, 0., 1.6]
+  NIDEC_ACCEL_LOOKUP_V = [-4.8, 0., 2.0]
 
-  NIDEC_MAX_ACCEL_V = [0.4, 1.6, 1.4, 0.6]
-  NIDEC_MAX_ACCEL_BP = [0.0, 6.0, 10., 20.]
+  NIDEC_MAX_ACCEL_V = [0.5, 2.4, 1.4, 0.6]
+  NIDEC_MAX_ACCEL_BP = [0.0, 4.0, 10., 20.]
 
-  NIDEC_GAS_MAX = 180  # 0xc6
+  NIDEC_GAS_MAX = 198  # 0xc6
   NIDEC_BRAKE_MAX = 1024 // 4
 
   BOSCH_ACCEL_MIN = -3.5  # m/s^2
@@ -45,7 +45,7 @@ class CarControllerParams:
     self.STEER_LOOKUP_V = [v * -1 for v in CP.lateralParams.torqueV][1:][::-1] + list(CP.lateralParams.torqueV)
 
 class LKAS_LIMITS:
-  STEER_MAX = 239
+  STEER_MAX = 240
   STEER_THRESHOLD = 30
   STEER_DELTA_UP = 7
   STEER_DELTA_DOWN = 8  # changed from 9, as getting "steering temporary not available" error at sharp turn, observed the error happens right after a sequential of steer values dropping at the delta_down value.   
