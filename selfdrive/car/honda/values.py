@@ -46,9 +46,9 @@ class CarControllerParams:
 
 class LKAS_LIMITS:
   STEER_MAX = 240
-  STEER_THRESHOLD = 30
+  STEER_THRESHOLD = 25
   STEER_DELTA_UP = 7
-  STEER_DELTA_DOWN = 8  # changed from 9, as getting "steering temporary not available" error at sharp turn, observed the error happens right after a sequential of steer values dropping at the delta_down value.   
+  STEER_DELTA_DOWN = 9  # changed from 9, as getting "steering temporary not available" error at sharp turn, observed the error happens right after a sequential of steer values dropping at the delta_down value.   
   STEER_DRIVER_ALLOWANCE = 25
   STEER_DRIVER_MULTIPLIER = 18
   STEER_DRIVER_FACTOR = 1
@@ -356,7 +356,7 @@ STEER_THRESHOLD = {
   CAR.HONDA_ACCORD_4CYL_9TH_GEN: 30,
   CAR.ACURA_RDX: 400,
   CAR.HONDA_CRV_EU: 400,
-  CAR.ACURA_MDX_20A: 30,
+  CAR.ACURA_MDX_20A: 25,
 }
 
 
