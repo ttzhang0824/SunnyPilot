@@ -234,7 +234,7 @@ class CarController(CarControllerBase):
     
     apply_steer = -apply_steer
 
-    if abs(CS.out.steeringAngleDeg) > 20   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+    if abs(CS.out.steeringAngleDeg) > 20:   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
       apply_steer = 0
    
     if not self.CP.pcmCruiseSpeed:
