@@ -221,25 +221,26 @@ class CarController(CarControllerBase):
             else:
                 self.apply_steer_over_max_counter = 0
       elif apply_steer < -229 and False:
-        apply_steer_orig = apply_steer
-        apply_steer = (apply_steer + 229) * 2 + apply_steer
-        if apply_steer < -240:
-            self.apply_steer_over_max_counter+= 1
-            if self.apply_steer_over_max_counter > 3:
-                apply_steer = apply_steer_orig
-                self.apply_steer_over_max_counter = 0
-            else:
-                self.apply_steer_over_max_counter = 0
+          apply_steer_orig = apply_steer
+          apply_steer = (apply_steer + 229) * 2 + apply_steer
+          if apply_steer < -240:
+              self.apply_steer_over_max_counter+= 1
+              if self.apply_steer_over_max_counter > 3:
+                  apply_steer = apply_steer_orig
+                  self.apply_steer_over_max_counter = 0
+              else:
+                  self.apply_steer_over_max_counter = 0
       else:
-        self.apply_steer_over_max_counter = 0
-    
+          self.apply_steer_over_max_counter = 0
+      
     
     apply_steer = -apply_steer
     self.lkas_disabled = False
-    if abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringRateDeg)> 15 or abs(CS.out.steeringTorque)> 95:   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+    if CS.out.vEgo > (22.5 * CV.MPH_TO_MS) and (abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringRateDeg)> 15 or abs(CS.out.steeringTorque)> 95):   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
         apply_steer = 0
         self.lkas_disabled = True
-    self.lkas_disabled = not self.lkas_disabled and CC.latActive
+    
+    self.lkas_disabled = CC.latActive and not self.lkas_disabled 
     
     if not self.CP.pcmCruiseSpeed:
       if not self.last_speed_limit_sign_tap_prev and CS.params_list.last_speed_limit_sign_tap:
