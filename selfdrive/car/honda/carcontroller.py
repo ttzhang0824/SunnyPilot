@@ -156,6 +156,8 @@ class CarController(CarControllerBase):
     self.m_tsc = 0
     self.steady_speed = 0
 
+    self.lkas_disabled = False
+
   def update(self, CC, CS, now_nanos):
     if not self.CP.pcmCruiseSpeed:
       self.sm.update(0)
@@ -233,10 +235,12 @@ class CarController(CarControllerBase):
     
     
     apply_steer = -apply_steer
-
-    if abs(CS.out.steeringAngleDeg) > 20:   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
-      apply_steer = 0
-   
+    self.lkas_disabled = False
+    if abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringRateDeg)> 15 or abs(CS.out.steeringTorque)> 95:   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+        apply_steer = 0
+        self.lkas_disabled = True
+    self.lkas_disabled = not self.lkas_disabled and CC.latActive
+    
     if not self.CP.pcmCruiseSpeed:
       if not self.last_speed_limit_sign_tap_prev and CS.params_list.last_speed_limit_sign_tap:
         self.sl_force_active_timer = self.frame
