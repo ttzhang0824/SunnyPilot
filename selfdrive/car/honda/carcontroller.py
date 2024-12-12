@@ -236,8 +236,8 @@ class CarController(CarControllerBase):
     
     apply_steer = -apply_steer
     self.lkas_disabled = False
-    if CS.out.vEgo > (22.5 * CV.MPH_TO_MS) and (abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringRateDeg)> 15 or abs(CS.out.steeringTorque)> 95):   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
-        apply_steer = 0
+    if CS.out.vEgo > (22.5 * CV.MPH_TO_MS) and (abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringTorque)> 95):   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+        # apply_steer = 0
         self.lkas_disabled = True
     
     self.lkas_disabled = CC.latActive and not self.lkas_disabled 
