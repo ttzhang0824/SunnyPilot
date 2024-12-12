@@ -236,7 +236,7 @@ class CarController(CarControllerBase):
     
     apply_steer = -apply_steer
     self.lkas_disabled = False
-    if CS.out.vEgo > (22.5 * CV.MPH_TO_MS) and (abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringTorque)> 95):   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
+    if CS.out.vEgo > (22.5 * CV.MPH_TO_MS) and (abs(CS.out.steeringAngleDeg) > 20 or abs(CS.out.steeringTorque) > 95):   # apply_steer == 0 or CS.out.vEgo < (10 * CV.MPH_TO_MS):
         # apply_steer = 0
         self.lkas_disabled = True
     
@@ -264,7 +264,7 @@ class CarController(CarControllerBase):
         can_sends.append(make_tester_present_msg(0x18DAB0F1, 1, suppress_response=True))
 
     # Send steering command.
-    can_sends.append(hondacan.create_steering_control(self.packer, self.CAN, apply_steer, not self.lkas_disabled, self.CP.carFingerprint,
+    can_sends.append(hondacan.create_steering_control(self.packer, self.CAN, apply_steer, self.lkas_disabled, self.CP.carFingerprint,
                                                       CS.CP.openpilotLongitudinalControl))
 
     # wind brake from air resistance decel at high speed
